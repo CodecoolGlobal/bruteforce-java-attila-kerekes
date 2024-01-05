@@ -3,9 +3,8 @@ package com.codecool.bruteforce.users.repository;
 import com.codecool.bruteforce.logger.Logger;
 import com.codecool.bruteforce.users.model.User;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
@@ -35,6 +34,26 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public void add(String userName, String password) {
+        String sql = "INSERT INTO users(user_name, password) VALUES(?, ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setString(1, userName);
+            pstmt.setString(2, password);
+            pstmt.executeUpdate();
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int id = generatedKeys.getInt(1);
+                    logger.logInfo("User added successfully with ID: " + id);
+                }
+            }
+
+
+        } catch (SQLException e) {
+            logger.logError(e.getMessage());
+        }
     }
 
     public void update(int id, String userName, String password) {
@@ -51,6 +70,29 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public List<User> getAll() {
-        return null;
+        String sql = "SELECT id, user_name, password FROM users";
+        List<User> users = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String userName = rs.getString("user_name");
+                String password = rs.getString("password");
+
+                // Create User object and add to the list
+                User user = new User(id, userName, password);
+                users.add(user);
+            }
+
+            logger.logInfo("Retrieved all users.");
+
+        } catch (SQLException e) {
+            logger.logError(e.getMessage());
+        }
+
+        return users;
     }
 }

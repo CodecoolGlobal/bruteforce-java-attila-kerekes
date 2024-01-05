@@ -1,6 +1,7 @@
 package com.codecool.bruteforce;
 
 import com.codecool.bruteforce.authentication.AuthenticationService;
+import com.codecool.bruteforce.logger.ConsoleLogger;
 import com.codecool.bruteforce.logger.Logger;
 import com.codecool.bruteforce.passwords.breaker.PasswordBreakerImpl;
 import com.codecool.bruteforce.passwords.generator.PasswordGenerator;
@@ -8,6 +9,7 @@ import com.codecool.bruteforce.passwords.generator.PasswordGeneratorImpl;
 import com.codecool.bruteforce.passwords.model.AsciiTableRange;
 import com.codecool.bruteforce.users.generator.UserGenerator;
 import com.codecool.bruteforce.users.generator.UserGeneratorImpl;
+import com.codecool.bruteforce.users.model.User;
 import com.codecool.bruteforce.users.repository.UserRepository;
 import com.codecool.bruteforce.users.repository.UserRepositoryImpl;
 
@@ -15,7 +17,7 @@ import java.util.List;
 
 public class Application {
 
-    private static Logger logger = null;
+    private static Logger logger = new ConsoleLogger();
 
     private static final AsciiTableRange lowercaseChars = new AsciiTableRange(97, 122);
     private static final AsciiTableRange uppercaseChars = new AsciiTableRange(65, 90);
@@ -23,7 +25,7 @@ public class Application {
 
     public static void main(String[] args) {
 
-        String dbFile = "src/resources/Users.db";
+        String dbFile = "src/main/resources/Users.db";
 
         UserRepository userRepository = new UserRepositoryImpl(dbFile, logger);
         userRepository.deleteAll();
@@ -40,19 +42,24 @@ public class Application {
         AuthenticationService authenticationService = null;
         //breakUsers(userCount, maxPwLength, authenticationService);
 
+        userRepository.add("Attila","attila123");
+        userRepository.add("Bela","bela456");
+        userRepository.add("Csaba","csaba789");
     }
 
     private static void addUsersToDb(int count, int maxPwLength, UserGenerator userGenerator,
-                                     UserRepository userRepository)
-    {
+                                     UserRepository userRepository) {
+        List<User> users = userGenerator.generate(count, maxPwLength);
+        users.forEach(user -> userRepository.add(user.userName(), user.password()));
+        logger.logInfo(String.format("%d users added to the database.", count));
     }
 
     private static List<PasswordGenerator> createPasswordGenerators() {
         var lowercasePwGen = new PasswordGeneratorImpl(lowercaseChars);
         var uppercasePwGen = new PasswordGeneratorImpl(lowercaseChars, uppercaseChars);
-        PasswordGenerator numbersPwGen = null; // lowercase + uppercase + numbers
+        var numbersPwGen = new PasswordGeneratorImpl(numbers);
 
-        return List.of(lowercasePwGen, uppercasePwGen, numbersPwGen);
+        return List.of(lowercasePwGen, uppercasePwGen,numbersPwGen);
     }
 
     private static void breakUsers(int userCount, int maxPwLength, AuthenticationService authenticationService) {
@@ -85,7 +92,5 @@ public class Application {
             }
         }
     }
-
-
 
 }
