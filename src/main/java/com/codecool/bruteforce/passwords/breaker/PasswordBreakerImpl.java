@@ -7,7 +7,19 @@ public class PasswordBreakerImpl implements PasswordBreaker {
 
     @Override
     public List<String> getCombinations(int passwordLength) {
-        return null;
+        List<List<String>> characters = new ArrayList<>();
+        for (int i = 0; i < passwordLength; i++) {
+            characters.add(getAsciiCharacters());
+        }
+        return getAllPossibleCombos(characters);
+    }
+
+    private static List<String> getAsciiCharacters() {
+        List<String> asciiChars = new ArrayList<>();
+        for (int i = 0; i < 127; i++) {
+            asciiChars.add(String.valueOf((char) i));
+        }
+        return asciiChars;
     }
 
     private static List<String> getAllPossibleCombos(List<List<String>> strings) {

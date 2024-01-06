@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
             String url = "jdbc:sqlite:" + dbFile;
             conn = DriverManager.getConnection(url);
 
-            logger.logInfo("Connection to SQLite has been established.");
+            //logger.logInfo("Connection to SQLite has been established.");
 
             return conn;
 
@@ -87,7 +87,7 @@ public class UserRepositoryImpl implements UserRepository {
                 users.add(user);
             }
 
-            logger.logInfo("Retrieved all users.");
+            //logger.logInfo("Retrieved all users.");
 
         } catch (SQLException e) {
             logger.logError(e.getMessage());

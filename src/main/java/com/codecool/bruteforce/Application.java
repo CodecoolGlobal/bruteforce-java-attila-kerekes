@@ -1,6 +1,7 @@
 package com.codecool.bruteforce;
 
 import com.codecool.bruteforce.authentication.AuthenticationService;
+import com.codecool.bruteforce.authentication.AuthenticationServiceImpl;
 import com.codecool.bruteforce.logger.ConsoleLogger;
 import com.codecool.bruteforce.logger.Logger;
 import com.codecool.bruteforce.passwords.breaker.PasswordBreakerImpl;
@@ -10,6 +11,8 @@ import com.codecool.bruteforce.passwords.model.AsciiTableRange;
 import com.codecool.bruteforce.users.generator.UserGenerator;
 import com.codecool.bruteforce.users.generator.UserGeneratorImpl;
 import com.codecool.bruteforce.users.model.User;
+import com.codecool.bruteforce.users.repository.CrackedUsersRepository;
+import com.codecool.bruteforce.users.repository.CrackedUsersRepositoryImpl;
 import com.codecool.bruteforce.users.repository.UserRepository;
 import com.codecool.bruteforce.users.repository.UserRepositoryImpl;
 
@@ -25,26 +28,26 @@ public class Application {
 
     public static void main(String[] args) {
 
-        String dbFile = "src/main/resources/Users.db";
+        String dbFileUsers = "src/main/resources/Users.db";
+        String dbFileCrackedUsers = "src/main/resources/CrackedUsers.db";
 
-        UserRepository userRepository = new UserRepositoryImpl(dbFile, logger);
+        UserRepository userRepository = new UserRepositoryImpl(dbFileUsers, logger);
         userRepository.deleteAll();
+
+        CrackedUsersRepository crackedUsersRepository = new CrackedUsersRepositoryImpl(dbFileCrackedUsers, logger);
 
         List<PasswordGenerator> passwordGenerators = createPasswordGenerators();
         UserGenerator userGenerator = new UserGeneratorImpl(logger, passwordGenerators);
-        int userCount = 10;
-        int maxPwLength = 4;
+        int userCount = 5;
+        int maxPwLength = 3;
 
         addUsersToDb(userCount, maxPwLength, userGenerator, userRepository);
 
         logger.logInfo(String.format("Database initialized with %d users; maximum password length: %d%n", userCount, maxPwLength));
 
-        AuthenticationService authenticationService = null;
-        //breakUsers(userCount, maxPwLength, authenticationService);
+        AuthenticationService authenticationService = new AuthenticationServiceImpl(userRepository);
+        breakUsers(userCount, maxPwLength, authenticationService, crackedUsersRepository);
 
-        userRepository.add("Attila","attila123");
-        userRepository.add("Bela","bela456");
-        userRepository.add("Csaba","csaba789");
     }
 
     private static void addUsersToDb(int count, int maxPwLength, UserGenerator userGenerator,
@@ -62,7 +65,8 @@ public class Application {
         return List.of(lowercasePwGen, uppercasePwGen,numbersPwGen);
     }
 
-    private static void breakUsers(int userCount, int maxPwLength, AuthenticationService authenticationService) {
+    private static void breakUsers(int userCount, int maxPwLength, AuthenticationService authenticationService,
+                                   CrackedUsersRepository crackedUsersRepository) {
         var passwordBreaker = new PasswordBreakerImpl();
         logger.logInfo("Initiating password breaker...\n");
 
@@ -75,15 +79,21 @@ public class Application {
                 long startTime = System.currentTimeMillis();
 
                 // Get all pw combinations
-                String[] pwCombinations = new String[0];
+                //String[] pwCombinations = new String[0];
+                List<String> pwCombinations = passwordBreaker.getCombinations(j);
                 boolean broken = false;
 
                 for (String pw : pwCombinations) {
-                    // Try to authenticate the current user with pw
-                    // If successful, stop measuring time, and print the pw and the elapsed time to the console, then go to next user
+                    if (authenticationService.authenticate(user, pw)) {
+                        long endTime = System.currentTimeMillis();
+                        long elapsedTime = endTime - startTime;
+                        logger.logInfo(String.format("Password for user %s cracked! Password: %s. Time taken: %d ms%n", user, pw, elapsedTime));
 
-                    long endTime = System.currentTimeMillis();
-                    long elapsedTime = endTime - startTime;
+                        crackedUsersRepository.addCrackedUser(user, pw, elapsedTime);
+
+                        broken = true;
+                        break;
+                    }
                 }
 
                 if (broken) {
