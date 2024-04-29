@@ -4,16 +4,15 @@ Brute forcing is a method of trying to break a password by systematically checki
 
 ## Overview
 
-The project uses SQLite, a lightweight and self-contained database solution, to store user credentials. It implements a brute force password breaker algorithm to crack passwords stored in the database. The application consists of components such as password and user generators, an authentication service, and a password breaker. 
+The project contains embedded database files in the resources folder, called Users.db and CrackedUsers.db to store user credentials on each rerun of the program. After setting up a predefined number of users with a predefined maximum password length, the program implements a brute-force password breaker algorithm to crack passwords stored in the database. The application consists of components such as password and user generators, an authentication service, and a password breaker. 
 
-In the Application.java file
-```bash
+To set the initial values, in the Application.java file modify these values:
+```java
 int userCount = <num>;
 int maxPwLength = <num>;
 ```
-should be set, to state the number of users to be generated in a Users.db file with the maximum length of passwords.
 
-After the program is run, a CrackedUsers.db file is generated with the list of cracked users, their passwords and the time required for that.
+After the program successfully runs, a list of cracked users, their passwords, and the required time in milliseconds is saved in the CrackedUsers.db.
 
 ## Prerequisites
 
