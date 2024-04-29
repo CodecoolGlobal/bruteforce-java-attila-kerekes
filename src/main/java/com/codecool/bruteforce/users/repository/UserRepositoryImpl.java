@@ -58,7 +58,19 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public void deleteAll() {
+        String sql = "DELETE FROM users";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int rowsAffected = pstmt.executeUpdate();
+            logger.logInfo(rowsAffected + " records deleted from the users table.");
+
+        } catch (SQLException e) {
+            logger.logError("Error deleting records from the users table: " + e.getMessage());
+        }
     }
+
 
     public User get(int id) {
         return null;

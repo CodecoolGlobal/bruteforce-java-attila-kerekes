@@ -37,7 +37,7 @@ public class Application {
 
         List<PasswordGenerator> passwordGenerators = createPasswordGenerators();
         UserGenerator userGenerator = new UserGeneratorImpl(logger, passwordGenerators);
-        int userCount = 5;
+        int userCount = 1;
         int maxPwLength = 3;
 
         addUsersToDb(userCount, maxPwLength, userGenerator, userRepository);
