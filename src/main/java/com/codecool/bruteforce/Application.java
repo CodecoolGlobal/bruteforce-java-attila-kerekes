@@ -59,7 +59,7 @@ public class Application {
         var uppercasePwGen = new PasswordGeneratorImpl(lowercaseChars, uppercaseChars);
         var numbersPwGen = new PasswordGeneratorImpl(numbers);
 
-        return List.of(lowercasePwGen, uppercasePwGen,numbersPwGen);
+        return List.of(lowercasePwGen, uppercasePwGen, numbersPwGen);
     }
 
     private static void breakUsers(int userCount, int maxPwLength, AuthenticationService authenticationService,
