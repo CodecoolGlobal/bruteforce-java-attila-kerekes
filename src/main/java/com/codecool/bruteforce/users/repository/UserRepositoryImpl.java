@@ -22,14 +22,11 @@ public class UserRepositoryImpl implements UserRepository {
             String url = "jdbc:sqlite:" + dbFile;
             conn = DriverManager.getConnection(url);
 
-            //logger.logInfo("Connection to SQLite has been established.");
-
             return conn;
 
         } catch (SQLException e) {
             logger.logError(e.getMessage());
         }
-
         return null;
     }
 
@@ -49,8 +46,6 @@ public class UserRepositoryImpl implements UserRepository {
                     logger.logInfo("User added successfully with ID: " + id);
                 }
             }
-
-
         } catch (SQLException e) {
             logger.logError(e.getMessage());
         }
@@ -82,17 +77,12 @@ public class UserRepositoryImpl implements UserRepository {
                 String userName = rs.getString("user_name");
                 String password = rs.getString("password");
 
-                // Create User object and add to the list
                 User user = new User(id, userName, password);
                 users.add(user);
             }
-
-            //logger.logInfo("Retrieved all users.");
-
         } catch (SQLException e) {
             logger.logError(e.getMessage());
         }
-
         return users;
     }
 }

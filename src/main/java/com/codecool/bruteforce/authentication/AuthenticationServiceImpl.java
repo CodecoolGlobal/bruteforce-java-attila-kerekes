@@ -21,8 +21,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 return true;
             }
         }
-
         return false;
     }
-
 }

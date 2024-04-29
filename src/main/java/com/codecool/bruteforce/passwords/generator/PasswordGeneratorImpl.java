@@ -1,6 +1,5 @@
 package com.codecool.bruteforce.passwords.generator;
 
-import com.codecool.bruteforce.logger.Logger;
 import com.codecool.bruteforce.passwords.model.AsciiTableRange;
 
 import java.util.Random;

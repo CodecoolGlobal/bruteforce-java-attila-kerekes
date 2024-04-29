@@ -33,7 +33,6 @@ public class PasswordBreakerImpl implements PasswordBreaker {
                     a.addAll(b);
                     return a;
                 });
-
         return combos;
     }
 }

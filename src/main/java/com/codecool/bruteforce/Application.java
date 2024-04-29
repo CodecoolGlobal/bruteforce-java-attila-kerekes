@@ -21,7 +21,6 @@ import java.util.List;
 public class Application {
 
     private static Logger logger = new ConsoleLogger();
-
     private static final AsciiTableRange lowercaseChars = new AsciiTableRange(97, 122);
     private static final AsciiTableRange uppercaseChars = new AsciiTableRange(65, 90);
     private static final AsciiTableRange numbers = new AsciiTableRange(48, 57);
@@ -47,11 +46,9 @@ public class Application {
 
         AuthenticationService authenticationService = new AuthenticationServiceImpl(userRepository);
         breakUsers(userCount, maxPwLength, authenticationService, crackedUsersRepository);
-
     }
 
-    private static void addUsersToDb(int count, int maxPwLength, UserGenerator userGenerator,
-                                     UserRepository userRepository) {
+    private static void addUsersToDb(int count, int maxPwLength, UserGenerator userGenerator, UserRepository userRepository) {
         List<User> users = userGenerator.generate(count, maxPwLength);
         users.forEach(user -> userRepository.add(user.userName(), user.password()));
         logger.logInfo(String.format("%d users added to the database.", count));
@@ -75,11 +72,8 @@ public class Application {
             for (int j = 1; j <= maxPwLength; j++) {
                 logger.logInfo(String.format("Trying to break %s with all possible password combinations with length = %d...%n", user, j));
 
-                // start measuring time
                 long startTime = System.currentTimeMillis();
 
-                // Get all pw combinations
-                //String[] pwCombinations = new String[0];
                 List<String> pwCombinations = passwordBreaker.getCombinations(j);
                 boolean broken = false;
 
@@ -95,12 +89,10 @@ public class Application {
                         break;
                     }
                 }
-
                 if (broken) {
                     break;
                 }
             }
         }
     }
-
 }

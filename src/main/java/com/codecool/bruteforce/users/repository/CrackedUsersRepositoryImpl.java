@@ -31,6 +31,4 @@ public class CrackedUsersRepositoryImpl implements CrackedUsersRepository {
             logger.logError("Error while adding cracked user to CrackedUsers database: " + e.getMessage());
         }
     }
-
-    // Implement other necessary methods here for interacting with the CrackedUsers database
 }
